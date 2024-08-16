@@ -1,7 +1,7 @@
 const vscode = require('vscode');
-const { createMainGoFile, initializeGoModule, goModTidy , createEnv, createExampleEnv, creategitIgnore, createFolders} = require('./helpers/createGoFiles');
+const { createMainGoFile, initializeGoModule, goModTidy , createEnv, createExampleEnv, creategitIgnore} = require('./helpers/createGoFiles');
 const {createDockerFile, createDockerComposeFile}=require('./helpers/createDockerFiles')
-
+const {createFolders}= require('./helpers/createFolders')
 /**
  * @param {vscode.ExtensionContext} context
  */
