@@ -38,7 +38,7 @@ function activate(context) {
 
             createMainGoFile(projectPath, framework);
             initializeGoModule(projectPath, moduleName);
-            goModTidy(projectPath);
+            //goModTidy(projectPath);
 			createEnv(projectPath);
 			createExampleEnv(projectPath);
 			createDockerFile(projectPath);

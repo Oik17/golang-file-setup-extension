@@ -184,25 +184,38 @@ function creategitIgnore(projectPath){
 }
 
 /**
- * Initializes the Go module with the provided module name.
+ * Runs `go mod tidy` and then `go run cmd/main.go`.
  * @param {string} projectPath - Path to the project directory.
-**/
-function runGo(projectPath) {
-    exec(`go mod tidy`, { cwd: projectPath }, (error, stdout, stderr) => {
-        if (error) {
-            vscode.window.showErrorMessage(`Error getting modules: ${stderr}`);
-            return;
-        }
-        vscode.window.showInformationMessage(`Successfully imported all modules.`);
-    });
-    exec(`go run cmd/main.go`, { cwd: projectPath }, (error, stdout, stderr) => {
-        if (error) {
-            vscode.window.showErrorMessage(`Error Running program: ${stderr}`);
-            return;
-        }
-    });
+ */
+async function runGo(projectPath) {
+    try {
+        await runCommand(`go mod tidy`, projectPath);
+        vscode.window.showInformationMessage('Successfully imported all modules.');
+
+        await runCommand(`go run cmd/main.go`, projectPath);
+        vscode.window.showInformationMessage('Program is running.');
+    } catch (error) {
+        vscode.window.showErrorMessage(`Error: ${error.message}`);
+    }
 }
 
+/**
+ * Executes a shell command in a given directory.
+ * @param {string} command - The command to run.
+ * @param {string} cwd - The directory to run the command in.
+ * @returns {Promise<void>} - A promise that resolves when the command completes.
+ */
+function runCommand(command, cwd) {
+    return new Promise((resolve, reject) => {
+        exec(command, { cwd }, (error, stdout, stderr) => {
+            if (error) {
+                reject(new Error(stderr || error.message));
+                return;
+            }
+            resolve(); 
+        });
+    });
+}
 
 module.exports = {
     createMainGoFile,
