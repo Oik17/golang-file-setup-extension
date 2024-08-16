@@ -51,7 +51,7 @@ function activate(context) {
 			creategitIgnore(projectPath);
 			createFolders(projectPath);
 			runGo(projectPath);
-			if(db=='Y') {
+			if(db=='Y'|| db=='y') {
 				createENVConfig(projectPath);
 				initSQLX(projectPath);
 			}
