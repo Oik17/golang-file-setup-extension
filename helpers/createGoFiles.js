@@ -83,6 +83,7 @@ import (
 
 func main() {
 	r := chi.NewRouter()
+    log.Println("Starting server on :3333")
 	r.Use(middleware.RequestID)
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
@@ -190,10 +191,16 @@ function creategitIgnore(projectPath){
  */
 async function runGo(projectPath) {
     try {
+        // Run go mod tidy using exec
         await runCommand(`go mod tidy`, projectPath);
         vscode.window.showInformationMessage('Successfully imported all modules.');
 
-        await runCommand(`go run cmd/main.go`, projectPath);
+        // Run go run cmd/main.go using VSCode terminal
+        const terminal = vscode.window.createTerminal({ name: "Go Run" });
+        terminal.show();
+        terminal.sendText(`cd "${projectPath}"`);
+        terminal.sendText(`go run cmd/main.go`);
+
         vscode.window.showInformationMessage('Program is running.');
     } catch (error) {
         vscode.window.showErrorMessage(`Error: ${error.message}`);
@@ -213,7 +220,7 @@ function runCommand(command, cwd) {
                 reject(new Error(stderr || error.message));
                 return;
             }
-            resolve();
+            resolve(); 
         });
     });
 }
