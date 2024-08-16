@@ -1,26 +1,39 @@
 {
   "name": "golang-sqlx-file-setup",
-  "displayName": "golang-sqlx-file-setup",
-  "description": "hopefully this will work",
-  "version": "0.0.1",
+  "displayName": "Golang SQLx File Setup",
+  "description": "An extension to set up Golang projects with different frameworks.",
+  "version": "0.1.0",
   "engines": {
     "vscode": "^1.92.0"
   },
   "categories": [
-    "Other"
+    "Programming Languages"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onCommand:golang-sqlx-file-setup.helloWorld",
+    "onCommand:golang-sqlx-file-setup.setupProject"
+  ],
   "main": "./extension.js",
   "contributes": {
-    "commands": [{
-      "command": "golang-sqlx-file-setup.helloWorld",
-      "title": "Hello World"
-    }]
+    "commands": [
+      {
+        "command": "golang-sqlx-file-setup.helloWorld",
+        "title": "Hello World"
+      },
+      {
+        "command": "golang-sqlx-file-setup.setupProject",
+        "title": "Setup Golang Project"
+      }
+    ]
   },
   "scripts": {
     "lint": "eslint .",
     "pretest": "npm run lint",
-    "test": "vscode-test"
+    "test": "vscode-test",
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "postinstall": "npm run compile"
   },
   "devDependencies": {
     "@types/vscode": "^1.92.0",
