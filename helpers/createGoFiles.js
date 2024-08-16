@@ -137,8 +137,9 @@ function initializeGoModule(projectPath, moduleName) {
 /**
  * Initializes the Go module with the provided module name.
  * @param {string} projectPath - Path to the project directory.
+ * @param {string} moduleName  - Module Name of go project
  */
-function initSQLX(projectPath){
+function initSQLX(projectPath, moduleName){
     let dbContent;
     dbContent=`package database
 
@@ -147,7 +148,7 @@ import (
 	"log"
 	"os"
 	"strconv"
-
+    "${moduleName}/internal/utils"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq" // Import the PostgreSQL driver
 )
@@ -330,7 +331,7 @@ async function runGo(projectPath) {
         terminal.sendText(`cd "${projectPath}"`);
         terminal.sendText(`go run cmd/main.go`);
 
-        vscode.window.showInformationMessage('Program is running.');
+        vscode.window.showInformationMessage('Program is running. Database migrations not included in main.go');
     } catch (error) {
         vscode.window.showErrorMessage(`Error: ${error.message}`);
     }

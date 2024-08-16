@@ -2,11 +2,11 @@ const vscode = require('vscode');
 const { createMainGoFile, initializeGoModule, goModTidy , createEnv, createExampleEnv, creategitIgnore, runGo, initSQLX, createENVConfig} = require('./helpers/createGoFiles');
 const {createDockerFile, createDockerComposeFile}=require('./helpers/createDockerFiles')
 const {createFolders}= require('./helpers/createFolders')
+
 /**
  * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
-    // Hello World Command
     let helloWorldCommand = vscode.commands.registerCommand('golang-sqlx-file-setup.helloWorld', function () {
         vscode.window.showInformationMessage('Hello World from golang-sqlx-file-setup!');
     });
@@ -40,6 +40,10 @@ function activate(context) {
 				prompt: 'Initialise db.go using sqlx? (Y/n)',
 				placeHolder: `Y/n`
 			})
+			if (!db) {
+                vscode.window.showErrorMessage('db choice is required.');
+                return;
+            }
 
             createMainGoFile(projectPath, framework);
             initializeGoModule(projectPath, moduleName);
@@ -53,7 +57,7 @@ function activate(context) {
 			runGo(projectPath);
 			if(db=='Y'|| db=='y') {
 				createENVConfig(projectPath);
-				initSQLX(projectPath);
+				initSQLX(projectPath, moduleName);
 			}
         } else {
             vscode.window.showErrorMessage('No workspace folder found!');
