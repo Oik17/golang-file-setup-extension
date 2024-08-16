@@ -1,5 +1,6 @@
 const vscode = require('vscode');
-const { createMainGoFile, initializeGoModule, goModTidy , createDockerFile} = require('./goHelpers');
+const { createMainGoFile, initializeGoModule, goModTidy , createEnv, createExampleEnv, creategitIgnore} = require('./helpers/createGoFiles');
+const {createDockerFile, createDockerComposeFile}=require('./helpers/createDockerFiles')
 
 /**
  * @param {vscode.ExtensionContext} context
@@ -15,7 +16,7 @@ function activate(context) {
         if (workspaceFolders) {
             const projectPath = workspaceFolders[0].uri.fsPath;
 
-            // Prompt user for module name
+            // Prompt user for module name	
             const moduleName = await vscode.window.showInputBox({
                 prompt: 'Enter the module name (e.g., github.com/username/project)',
                 placeHolder: 'Module name'
@@ -40,7 +41,11 @@ function activate(context) {
             createMainGoFile(projectPath, framework);
             initializeGoModule(projectPath, moduleName);
             goModTidy(projectPath);
+			createEnv(projectPath);
+			createExampleEnv(projectPath);
 			createDockerFile(projectPath);
+			createDockerComposeFile(projectPath);
+			creategitIgnore(projectPath);
         } else {
             vscode.window.showErrorMessage('No workspace folder found!');
         }

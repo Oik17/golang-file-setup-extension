@@ -87,44 +87,57 @@ function goModTidy(projectPath) {
     });
 }
 
+/**
+ * Initializes the Go module with the provided module name.
+ * @param {string} projectPath - Path to the project directory.
+**/
+function createEnv(projectPath){
+    let envContent;
+    envContent=`DB_HOST=db
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=abc
+DB_NAME=abc
+`
+const envPath=path.join(projectPath, '.env');
+fs.writeFileSync(envPath, envContent);
+}
 
 /**
  * Initializes the Go module with the provided module name.
  * @param {string} projectPath - Path to the project directory.
 **/
-function createDockerFile(projectPath){
-    let dockerFile;
-    dockerFile=`
-# Start from a more recent Go image
-FROM golang:1.21-alpine
-
-# Set the working directory inside the container
-WORKDIR /app
-
-# Copy go mod and sum files
-COPY go.mod go.sum ./
-
-# Download all dependencies
-RUN go mod download
-
-# Copy the source code into the container
-COPY . .
-
-# Build the application
-RUN go build -o main ./cmd/main.go
-
-# Expose port 8080 to the outside world
-EXPOSE 8080
-
-# Command to run the executable
-CMD ["./main"]`
-const dockerFilePath=path.join(projectPath, 'Dockerfile');
-fs.writeFileSync(dockerFilePath, dockerFile);
+function createExampleEnv(projectPath){
+    let envContent;
+    envContent=`DB_HOST=db
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=abc
+DB_NAME=abc
+`
+const envPath=path.join(projectPath, '.example.env');
+fs.writeFileSync(envPath, envContent);
 }
+
+/**
+ * Initializes the Go module with the provided module name.
+ * @param {string} projectPath - Path to the project directory.
+**/
+function creategitIgnore(projectPath){
+    let gitIgnoreContent;
+    gitIgnoreContent=`.env
+`
+const gitIgnorePath=path.join(projectPath, '.gitignore');
+fs.writeFileSync(gitIgnorePath, gitIgnoreContent);
+}
+
+
 
 module.exports = {
     createMainGoFile,
     initializeGoModule,
     goModTidy,
-    createDockerFile
+    createEnv,
+    createExampleEnv,
+    creategitIgnore
 };
