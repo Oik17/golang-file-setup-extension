@@ -75,6 +75,8 @@ func main() {
             mainGoContent=`package main
 
 import (
+	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -83,17 +85,22 @@ import (
 
 func main() {
 	r := chi.NewRouter()
-    log.Println("Starting server on :3333")
+	log.Println("Starting server on http://localhost:3333")
 	r.Use(middleware.RequestID)
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("hello world"))
+		response := map[string]string{"message": "hello world"}
+
+		w.Header().Set("Content-Type", "application/json")
+
+		json.NewEncoder(w).Encode(response)
 	})
 
 	http.ListenAndServe(":3333", r)
-}`; 
+}
+`; 
         break;
         default:
             vscode.window.showErrorMessage('Unsupported framework. Please enter "gin", "echo", "fiber" or "chi"');
@@ -124,6 +131,128 @@ function initializeGoModule(projectPath, moduleName) {
         }
         vscode.window.showInformationMessage(`Go module initialized with name ${moduleName}.`);
     });
+}
+
+
+/**
+ * Initializes the Go module with the provided module name.
+ * @param {string} projectPath - Path to the project directory.
+ */
+function initSQLX(projectPath){
+    let dbContent;
+    dbContent=`package database
+
+import (
+	"fmt"
+	"log"
+	"os"
+	"strconv"
+
+	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq" // Import the PostgreSQL driver
+)
+
+type Dbinstance struct {
+	Db *sqlx.DB
+}
+
+var DB Dbinstance
+
+func Connect() {
+	p := utils.Config("DB_PORT")
+	port, err := strconv.Atoi(p)
+	if err != nil {
+		fmt.Println("Error parsing str to int")
+	}
+
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=require TimeZone=Asia/Shanghai", utils.Config("DB_HOST"), utils.Config("DB_USER"), utils.Config("DB_PASSWORD"), utils.Config("DB_NAME"), port)
+
+	db, err := sqlx.Open("postgres", dsn)
+	if err != nil {
+		log.Fatal(err.Error())
+		log.Fatal("Failed to connect to database. \\n", err)
+		os.Exit(2)
+	}
+
+	if err := db.Ping(); err != nil {
+		log.Fatal(err.Error())
+		log.Fatal("Failed to ping the database. \\n", err)
+		os.Exit(2)
+	}
+
+	log.Println("Connected")
+
+	runMigrations(db)
+
+	DB = Dbinstance{
+		Db: db,
+	}
+}
+
+func runMigrations(db *sqlx.DB) {
+	_, err := db.Exec(\`
+		CREATE TABLE test (test VARCHAR(255));
+	\`)
+
+	if err != nil {
+		log.Fatal("Failed to run migrations. \\n", err)
+		os.Exit(2)
+	}
+
+	log.Println("Migrations completed")
+}`
+    const internal=path.join(projectPath, 'internal');
+    if(!fs.existsSync(internal)){
+        fs.mkdirSync(internal)
+    }
+
+    const dbDir=path.join(internal, 'database');
+    if(!fs.existsSync(dbDir)){
+        fs.mkdirSync(dbDir);
+    }
+    const dbPath=path.join(dbDir, 'db.go');
+    fs.writeFileSync(dbPath, dbContent);
+    vscode.window.showInformationMessage(`db file created. Edit inside db.Exec to create respective tables. Do ctrl+s once to import utils`);
+    goModTidy(projectPath);
+}
+
+
+/**
+ * Initializes the Go module with the provided module name.
+ * @param {string} projectPath - Path to the project directory.
+ */
+function createENVConfig(projectPath){
+    let utilsContent;
+    utilsContent=`package utils
+
+import (
+	"fmt"
+	"os"
+
+	"github.com/joho/godotenv"
+)
+
+func Config(key string) string {
+	err := godotenv.Load(".env")
+	if err != nil {
+		fmt.Print("Error loading .env file")
+	}
+	return os.Getenv(key)
+}
+`
+    const internal=path.join(projectPath, 'internal');
+    if(!fs.existsSync(internal)){
+        fs.mkdirSync(internal)
+    }
+
+    const utilsDir=path.join(internal, 'utils');
+    if(!fs.existsSync(utilsDir)){
+        fs.mkdirSync(utilsDir);
+    }
+    const utilsPath=path.join(utilsDir, 'envConfig.go');
+    fs.writeFileSync(utilsPath, utilsContent);
+    vscode.window.showInformationMessage(`utils file created.`);
+    goModTidy(projectPath);
 }
 
 /**
@@ -232,5 +361,7 @@ module.exports = {
     createEnv,
     createExampleEnv,
     creategitIgnore,
-    runGo
+    runGo,
+    initSQLX,
+    createENVConfig
 };

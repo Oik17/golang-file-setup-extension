@@ -1,5 +1,5 @@
 const vscode = require('vscode');
-const { createMainGoFile, initializeGoModule, goModTidy , createEnv, createExampleEnv, creategitIgnore, runGo} = require('./helpers/createGoFiles');
+const { createMainGoFile, initializeGoModule, goModTidy , createEnv, createExampleEnv, creategitIgnore, runGo, initSQLX, createENVConfig} = require('./helpers/createGoFiles');
 const {createDockerFile, createDockerComposeFile}=require('./helpers/createDockerFiles')
 const {createFolders}= require('./helpers/createFolders')
 /**
@@ -28,13 +28,18 @@ function activate(context) {
 
             const framework = await vscode.window.showInputBox({
                 prompt: 'Enter the framework (gin/echo/fiber/chi)',
-                placeHolder: 'gin or echo'
+                placeHolder: 'gin/echo/fiber/chi'
             });
 
             if (!framework) {
                 vscode.window.showErrorMessage('Framework choice is required.');
                 return;
             }
+
+			const db=await vscode.window.showInputBox({
+				prompt: 'Initialise db.go using sqlx? (Y/n)',
+				placeHolder: `Y/n`
+			})
 
             createMainGoFile(projectPath, framework);
             initializeGoModule(projectPath, moduleName);
@@ -45,8 +50,11 @@ function activate(context) {
 			createDockerComposeFile(projectPath);
 			creategitIgnore(projectPath);
 			createFolders(projectPath);
-			
 			runGo(projectPath);
+			if(db=='Y') {
+				createENVConfig(projectPath);
+				initSQLX(projectPath);
+			}
         } else {
             vscode.window.showErrorMessage('No workspace folder found!');
         }
