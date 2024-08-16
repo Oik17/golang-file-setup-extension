@@ -183,6 +183,7 @@ function creategitIgnore(projectPath){
     fs.writeFileSync(gitIgnorePath, gitIgnoreContent);
 }
 
+
 /**
  * Runs `go mod tidy` and then `go run cmd/main.go`.
  * @param {string} projectPath - Path to the project directory.
@@ -212,7 +213,7 @@ function runCommand(command, cwd) {
                 reject(new Error(stderr || error.message));
                 return;
             }
-            resolve(); 
+            resolve();
         });
     });
 }
