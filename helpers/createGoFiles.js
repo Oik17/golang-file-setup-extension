@@ -46,8 +46,56 @@ func main() {
 }
             `;
             break;
+        
+        case 'fiber':
+            mainGoContent=`package main
+
+import (
+    "log"
+    
+    "github.com/gofiber/fiber/v2"
+    "github.com/gofiber/fiber/v2/middleware/cors"
+)
+
+func main() {
+    app := fiber.New()
+
+    app.Use(cors.New())
+
+    app.Get("/", func(c *fiber.Ctx) error {
+        return c.JSON(fiber.Map{
+            "message": "Hello World",
+        })
+    })
+
+    log.Fatal(app.Listen(":3000"))
+}`;
+        break;
+        case 'chi':
+            mainGoContent=`package main
+
+import (
+	"net/http"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
+)
+
+func main() {
+	r := chi.NewRouter()
+	r.Use(middleware.RequestID)
+	r.Use(middleware.Logger)
+	r.Use(middleware.Recoverer)
+
+	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("hello world"))
+	})
+
+	http.ListenAndServe(":3333", r)
+}`; 
+        break;
         default:
-            vscode.window.showErrorMessage('Unsupported framework. Please enter "gin" or "echo".');
+            vscode.window.showErrorMessage('Unsupported framework. Please enter "gin", "echo", "fiber" or "chi"');
             return;
     }
 
@@ -135,6 +183,25 @@ function creategitIgnore(projectPath){
     fs.writeFileSync(gitIgnorePath, gitIgnoreContent);
 }
 
+/**
+ * Initializes the Go module with the provided module name.
+ * @param {string} projectPath - Path to the project directory.
+**/
+function runGo(projectPath) {
+    exec(`go mod tidy`, { cwd: projectPath }, (error, stdout, stderr) => {
+        if (error) {
+            vscode.window.showErrorMessage(`Error getting modules: ${stderr}`);
+            return;
+        }
+        vscode.window.showInformationMessage(`Successfully imported all modules.`);
+    });
+    exec(`go run cmd/main.go`, { cwd: projectPath }, (error, stdout, stderr) => {
+        if (error) {
+            vscode.window.showErrorMessage(`Error Running program: ${stderr}`);
+            return;
+        }
+    });
+}
 
 
 module.exports = {
@@ -144,4 +211,5 @@ module.exports = {
     createEnv,
     createExampleEnv,
     creategitIgnore,
+    runGo
 };

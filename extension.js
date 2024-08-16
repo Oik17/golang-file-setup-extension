@@ -1,5 +1,5 @@
 const vscode = require('vscode');
-const { createMainGoFile, initializeGoModule, goModTidy , createEnv, createExampleEnv, creategitIgnore} = require('./helpers/createGoFiles');
+const { createMainGoFile, initializeGoModule, goModTidy , createEnv, createExampleEnv, creategitIgnore, runGo} = require('./helpers/createGoFiles');
 const {createDockerFile, createDockerComposeFile}=require('./helpers/createDockerFiles')
 const {createFolders}= require('./helpers/createFolders')
 /**
@@ -27,7 +27,7 @@ function activate(context) {
             }
 
             const framework = await vscode.window.showInputBox({
-                prompt: 'Enter the framework (gin/echo)',
+                prompt: 'Enter the framework (gin/echo/fiber/chi)',
                 placeHolder: 'gin or echo'
             });
 
@@ -45,6 +45,8 @@ function activate(context) {
 			createDockerComposeFile(projectPath);
 			creategitIgnore(projectPath);
 			createFolders(projectPath);
+			
+			runGo(projectPath);
         } else {
             vscode.window.showErrorMessage('No workspace folder found!');
         }
