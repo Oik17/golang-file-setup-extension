@@ -51,11 +51,15 @@ func main() {
             return;
     }
 
-    // Create the main.go file
-    const mainGoPath = path.join(projectPath, 'main.go');
+    const internalDir = path.join(projectPath, 'cmd');
+    if (!fs.existsSync(internalDir)) {
+        fs.mkdirSync(internalDir);
+    }
+
+    const mainGoPath = path.join(internalDir, 'main.go');
     fs.writeFileSync(mainGoPath, mainGoContent);
 
-    vscode.window.showInformationMessage(`main.go file created with ${framework} framework.`);
+    vscode.window.showInformationMessage(`main.go file created inside 'cmd' directory with ${framework} framework.`);
 }
 
 /**

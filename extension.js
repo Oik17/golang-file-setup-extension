@@ -16,7 +16,6 @@ function activate(context) {
         if (workspaceFolders) {
             const projectPath = workspaceFolders[0].uri.fsPath;
 
-            // Prompt user for module name	
             const moduleName = await vscode.window.showInputBox({
                 prompt: 'Enter the module name (e.g., github.com/username/project)',
                 placeHolder: 'Module name'
@@ -27,7 +26,6 @@ function activate(context) {
                 return;
             }
 
-            // Prompt user for framework choice
             const framework = await vscode.window.showInputBox({
                 prompt: 'Enter the framework (gin/echo)',
                 placeHolder: 'gin or echo'
